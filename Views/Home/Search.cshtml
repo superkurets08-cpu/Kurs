@@ -1,0 +1,87 @@
+@model SearchViewModel
+
+@{
+    ViewData["Title"] = "Поиск";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Global Search</div>
+        <h1>Поиск по архиву</h1>
+        <p>Найдите турнир, команду, игрока, героя или предмет из одной строки поиска.</p>
+        <form class="hero-search" asp-action="Search" method="get">
+            <input type="search" name="query" value="@Model.Query" placeholder="Например: Team Spirit, TI 10, Invoker" />
+            <button class="btn-link" type="submit">Найти</button>
+        </form>
+    </section>
+
+    <section class="panel reveal">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Результат поиска</div>
+                <h2>@Model.TotalCount совпадений</h2>
+            </div>
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(Model.Query))
+        {
+            <div class="empty-state">
+                <h3>Введите запрос</h3>
+                <p class="muted">Поиск поддерживает турниры и команды для гостей, а после авторизации также игроков, героев и предметы.</p>
+            </div>
+        }
+        else if (Model.Results.Any())
+        {
+            @if (Model.Suggestions.Any())
+            {
+                <div class="section-heading">
+                    <div>
+                        <div class="section-kicker">Подсказки</div>
+                        <h3>Возможные точные совпадения</h3>
+                    </div>
+                </div>
+                <div class="search-results">
+                    @foreach (var suggestion in Model.Suggestions)
+                    {
+                        <a class="search-result" href="@suggestion.Url">
+                            <div>
+                                <span class="search-result__category">@suggestion.Category</span>
+                                <h3>@suggestion.Label</h3>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+
+            @foreach (var group in Model.Groups)
+            {
+                <div class="section-heading" style="margin-top: 24px;">
+                    <div>
+                        <div class="section-kicker">Категория</div>
+                        <h3>@group.Category</h3>
+                    </div>
+                </div>
+                <div class="search-results">
+                    @foreach (var result in group.Items)
+                    {
+                        <a class="search-result" href="@result.Url">
+                            <div>
+                                <span class="search-result__category">@result.Category</span>
+                                <h3>@result.Title</h3>
+                                <p class="muted">@result.Subtitle</p>
+                            </div>
+                            <span class="badge">@result.Badge</span>
+                        </a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <h3>Ничего не найдено</h3>
+                <p class="muted">Попробуйте более короткий запрос или другое написание названия.</p>
+            </div>
+        }
+    </section>
+</div>

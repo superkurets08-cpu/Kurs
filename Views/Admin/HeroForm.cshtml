@@ -1,0 +1,40 @@
+@model Hero
+
+@{
+    var isEdit = Model.HeroID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование героя" : "Новый герой";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните основные характеристики героя и добавьте изображение для карточек сайта.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditHero" : "CreateHero")" method="post" enctype="multipart/form-data" class="stack-form">
+            <input asp-for="HeroID" type="hidden" />
+            <label class="field"><span>Имя героя</span><input asp-for="HeroName" /></label>
+            <label class="field"><span>Основной атрибут</span><input asp-for="PrimaryAttribute" /></label>
+            <label class="field"><span>Тип атаки</span><input asp-for="AttackType" /></label>
+            <label class="field"><span>URL аватарки</span><input asp-for="AvatarUrl" /></label>
+            <label class="field"><span>Загрузить аватарку</span><input type="file" name="avatarFile" accept=".png,.jpg,.jpeg,.webp,.gif" /></label>
+            <label class="field"><span>Прирост силы</span><input asp-for="StrengthGain" type="number" step="0.01" /></label>
+            <label class="field"><span>Прирост ловкости</span><input asp-for="AgilityGain" type="number" step="0.01" /></label>
+            <label class="field"><span>Прирост интеллекта</span><input asp-for="IntelligenceGain" type="number" step="0.01" /></label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+            {
+                <div class="inline-avatar-preview">
+                    <img class="avatar avatar--lg" src="@Model.AvatarUrl" alt="Аватар героя @Model.HeroName" />
+                    <span class="muted">Текущая аватарка героя</span>
+                </div>
+            }
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Heroes">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

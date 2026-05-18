@@ -1,0 +1,75 @@
+@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Админ-панель";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Админ-панель</h1>
+        <p>Здесь администратор управляет содержимым архива, пользователями, матчами и следит за историей своих действий.</p>
+    </section>
+
+    <section class="stats-grid">
+        <article class="stat-card"><span class="stat-card__label">Пользователи</span><strong class="stat-card__value">@Model.UsersCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Турниры</span><strong class="stat-card__value">@Model.TournamentsCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Команды</span><strong class="stat-card__value">@Model.TeamsCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Игроки</span><strong class="stat-card__value">@Model.PlayersCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Матчи</span><strong class="stat-card__value">@Model.MatchesCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Предметы</span><strong class="stat-card__value">@Model.ItemsCount</strong></article>
+        <article class="stat-card"><span class="stat-card__label">Журнал действий</span><strong class="stat-card__value">@Model.AdminLogsCount</strong></article>
+    </section>
+
+    <section class="card-grid card-grid--three">
+        <a class="tile" asp-action="Users"><h3>Пользователи</h3><p class="muted">Создание аккаунтов, смена ролей и блокировка доступа.</p></a>
+        <a class="tile" asp-action="Matches"><h3>Матчи</h3><p class="muted">Управление матчами, победителями и MVP.</p></a>
+        <a class="tile" asp-action="Tournaments"><h3>Турниры</h3><p class="muted">Управление архивом турниров.</p></a>
+        <a class="tile" asp-action="Teams"><h3>Команды</h3><p class="muted">Добавление и редактирование команд.</p></a>
+        <a class="tile" asp-action="Players"><h3>Игроки</h3><p class="muted">Составы, роли, аватарки и связи с командами.</p></a>
+        <a class="tile" asp-action="Heroes"><h3>Герои</h3><p class="muted">Справочник героев, характеристики и изображения.</p></a>
+        <a class="tile" asp-action="Items"><h3>Предметы</h3><p class="muted">Справочник предметов и категорий.</p></a>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Admin Activity</div>
+                <h2>Журнал действий администратора</h2>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Когда</th>
+                        <th>Администратор</th>
+                        <th>Действие</th>
+                        <th>Сущность</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.RecentAdminActions.Any())
+                {
+                    @foreach (var log in Model.RecentAdminActions)
+                    {
+                        <tr>
+                            <td>@log.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@log.AdminUser?.UserName</td>
+                            <td>@log.ActionType</td>
+                            <td>@log.EntityType @(log.EntityId.HasValue ? $"#{log.EntityId}" : string.Empty)</td>
+                            <td>@log.Description</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">Записей в журнале пока нет.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

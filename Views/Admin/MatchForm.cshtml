@@ -1,0 +1,112 @@
+@model AdminMatchFormViewModel
+
+@{
+    var isEdit = Model.Match.MatchID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование матча" : "Новый матч";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните данные матча, участников и победителя.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditMatch" : "CreateMatch")" method="post" class="stack-form">
+            <input asp-for="Match.MatchID" type="hidden" />
+            <label class="field">
+                <span>Турнир</span>
+                <select asp-for="Match.TournamentID">
+                    <option value="">Выберите турнир</option>
+                    @foreach (var tournament in Model.Tournaments)
+                    {
+                        if (Model.Match.TournamentID == tournament.TournamentID)
+                        {
+                            <option value="@tournament.TournamentID" selected>@tournament.TournamentName</option>
+                        }
+                        else
+                        {
+                            <option value="@tournament.TournamentID">@tournament.TournamentName</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field"><span>Стадия</span><input asp-for="Match.Stage" /></label>
+            <label class="field"><span>Дата</span><input asp-for="Match.MatchDate" type="date" /></label>
+            <label class="field">
+                <span>Команда 1</span>
+                <select asp-for="Match.Team1ID">
+                    <option value="">Выберите команду</option>
+                    @foreach (var team in Model.Teams)
+                    {
+                        if (Model.Match.Team1ID == team.TeamID)
+                        {
+                            <option value="@team.TeamID" selected>@team.TeamName</option>
+                        }
+                        else
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field">
+                <span>Команда 2</span>
+                <select asp-for="Match.Team2ID">
+                    <option value="">Выберите команду</option>
+                    @foreach (var team in Model.Teams)
+                    {
+                        if (Model.Match.Team2ID == team.TeamID)
+                        {
+                            <option value="@team.TeamID" selected>@team.TeamName</option>
+                        }
+                        else
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field">
+                <span>Победитель</span>
+                <select asp-for="Match.WinnerTeamID">
+                    <option value="">Выберите команду</option>
+                    @foreach (var team in Model.Teams)
+                    {
+                        if (Model.Match.WinnerTeamID == team.TeamID)
+                        {
+                            <option value="@team.TeamID" selected>@team.TeamName</option>
+                        }
+                        else
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field">
+                <span>MVP</span>
+                <select asp-for="Match.MVPPlayerID">
+                    <option value="">Не выбран</option>
+                    @foreach (var player in Model.Players)
+                    {
+                        if (Model.Match.MVPPlayerID == player.PlayerID)
+                        {
+                            <option value="@player.PlayerID" selected>@player.Nickname</option>
+                        }
+                        else
+                        {
+                            <option value="@player.PlayerID">@player.Nickname</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field"><span>Внешняя ссылка</span><input asp-for="Match.match_url" /></label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Matches">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

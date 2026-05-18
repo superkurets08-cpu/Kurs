@@ -1,0 +1,80 @@
+@model TournamentsPageViewModel
+
+@{
+    ViewData["Title"] = "Турниры";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Tournament Archive</div>
+        <h1>Турниры The International</h1>
+        <p>История TI с фильтрацией по годам, быстрым поиском по чемпионам и удобной точкой входа в детальные страницы турниров.</p>
+    </section>
+
+    <section class="panel reveal">
+        <form class="filters filters--compact" method="get">
+            <input type="search" name="searchTerm" value="@Model.SearchTerm" placeholder="Поиск по названию, локации или чемпиону" />
+            <select name="year">
+                <option value="">Все годы</option>
+                @foreach (var yearOption in Model.AvailableYears)
+                {
+                    if (Model.Year == yearOption)
+                    {
+                        <option value="@yearOption" selected>@yearOption</option>
+                    }
+                    else
+                    {
+                        <option value="@yearOption">@yearOption</option>
+                    }
+                }
+            </select>
+            <button class="btn-link" type="submit">Применить</button>
+            <a class="btn-secondary" asp-action="Tournaments">Сбросить</a>
+        </form>
+    </section>
+
+    <section class="panel reveal">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Найдено записей</div>
+                <h2>@Model.TotalCount турниров</h2>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Год</th>
+                        <th>Название</th>
+                        <th>Призовой фонд</th>
+                        <th>Локация</th>
+                        <th>Победитель</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Tournaments.Any())
+                {
+                    @foreach (var tournament in Model.Tournaments)
+                    {
+                        <tr>
+                            <td>@tournament.Year</td>
+                            <td>@tournament.TournamentName</td>
+                            <td>@(tournament.PrizePool.HasValue ? $"${tournament.PrizePool.Value:n3} млн" : "-")</td>
+                            <td>@tournament.Location</td>
+                            <td>@tournament.ChampionTeam</td>
+                            <td><a class="btn-link btn-link--small" asp-action="TournamentDetails" asp-route-id="@tournament.TournamentID">Детали</a></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">По выбранным фильтрам ничего не найдено.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

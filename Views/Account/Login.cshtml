@@ -1,0 +1,66 @@
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Вход";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+    var googleLoginEnabled = ViewData["GoogleLoginEnabled"] as bool? == true;
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>Вход в систему</h1>
+        <p>Авторизованные пользователи получают доступ к игрокам, героям, предметам и форме обратной связи.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="Login" method="post" class="stack-form">
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <label class="field">
+                <span>Логин</span>
+                <input asp-for="UserName" />
+                <span asp-validation-for="UserName" class="field-validation"></span>
+            </label>
+
+            <label class="field">
+                <span>Пароль</span>
+                <input asp-for="Password" />
+                <span asp-validation-for="Password" class="field-validation"></span>
+            </label>
+
+            <label class="checkbox-field">
+                <input asp-for="RememberMe" />
+                <span>Запомнить меня</span>
+            </label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Войти</button>
+                <a class="btn-secondary" asp-action="Register">Создать аккаунт</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Вход через Google</h2>
+        <p class="muted">Можно войти через Google, не отказываясь от обычного логина и пароля.</p>
+
+        @if (googleLoginEnabled)
+        {
+            <form asp-action="ExternalLogin" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Google" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button class="btn-secondary" type="submit">Продолжить через Google</button>
+            </form>
+        }
+        else
+        {
+            <p class="muted">Google-вход появится после заполнения `Authentication:Google:ClientId` и `Authentication:Google:ClientSecret`.</p>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,73 @@
+@model HeroDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Hero.HeroName;
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Hero Profile</div>
+        @if (!string.IsNullOrWhiteSpace(Model.Hero.AvatarUrl))
+        {
+            <img class="avatar avatar--hero" src="@Model.Hero.AvatarUrl" alt="Аватар героя @Model.Hero.HeroName" />
+        }
+        else
+        {
+            <div class="avatar avatar--hero avatar--fallback">@AvatarHelper.GetInitials(Model.Hero.HeroName)</div>
+        }
+        <h1>@Model.Hero.HeroName</h1>
+        <p>@Model.Summary</p>
+        <div class="hero__actions">
+            <span class="badge">@Model.Hero.PrimaryAttribute</span>
+            <span class="badge">@Model.Hero.AttackType</span>
+        </div>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+        <article class="detail-card">
+            <h3>Характеристики</h3>
+            <div class="meta-row"><span class="muted">STR gain</span><strong>@Model.Hero.StrengthGain</strong></div>
+            <div class="meta-row"><span class="muted">AGI gain</span><strong>@Model.Hero.AgilityGain</strong></div>
+            <div class="meta-row"><span class="muted">INT gain</span><strong>@Model.Hero.IntelligenceGain</strong></div>
+        </article>
+        <article class="detail-card" style="grid-column: span 2;">
+            <h3>Игровой стиль</h3>
+            <p class="muted">@Model.Playstyle</p>
+        </article>
+    </section>
+
+    <section class="card-grid card-grid--two reveal">
+        <article class="detail-card">
+            <h3>Похожие герои</h3>
+            @if (Model.SimilarHeroes.Any())
+            {
+                @foreach (var hero in Model.SimilarHeroes)
+                {
+                    <a class="meta-row meta-row--link" asp-action="HeroDetails" asp-route-id="@hero.HeroID">
+                        <span>@hero.HeroName</span><span class="muted">@hero.PrimaryAttribute / @hero.AttackType</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <p class="muted">Похожих героев в текущем архиве пока нет.</p>
+            }
+        </article>
+        <article class="detail-card">
+            <h3>Подходящие предметы</h3>
+            @if (Model.SuggestedItems.Any())
+            {
+                @foreach (var item in Model.SuggestedItems)
+                {
+                    <a class="meta-row meta-row--link" asp-action="ItemDetails" asp-route-id="@item.ItemID">
+                        <span>@item.ItemName</span><span class="muted">@item.Category</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <p class="muted">Для героя пока не найдено рекомендаций по предметам.</p>
+            }
+        </article>
+    </section>
+</div>

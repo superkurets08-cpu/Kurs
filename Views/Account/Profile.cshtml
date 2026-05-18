@@ -1,0 +1,67 @@
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Profile</div>
+        <h1>Личный кабинет</h1>
+        <p>Здесь можно посмотреть данные аккаунта, статистику активности и обновить свою аватарку.</p>
+    </section>
+
+    <section class="panel reveal">
+        <div class="profile-card">
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+            {
+                <img class="avatar avatar--xl" src="@Model.AvatarUrl" alt="Аватар пользователя @Model.UserName" />
+            }
+            else
+            {
+                <div class="avatar avatar--xl avatar--fallback">@AvatarHelper.GetInitials(Model.UserName)</div>
+            }
+
+            <div class="stack-form">
+                <div class="meta-row"><span class="muted">Логин</span><strong>@Model.UserName</strong></div>
+                <div class="meta-row"><span class="muted">Email</span><strong>@Model.Email</strong></div>
+                <div class="meta-row"><span class="muted">Роль</span><strong>@Model.Role</strong></div>
+                <div class="meta-row"><span class="muted">Регистрация</span><strong>@Model.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</strong></div>
+                <div class="meta-row"><span class="muted">Комментариев</span><strong>@Model.CommentsCount</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel reveal">
+        <form asp-action="Profile" method="post" enctype="multipart/form-data" class="stack-form">
+            @Html.AntiForgeryToken()
+
+            <label class="field">
+                <span>Новая аватарка</span>
+                <input asp-for="AvatarFile" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg" />
+            </label>
+
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">Preset Avatars</div>
+                    <h2>Выберите готовую аватарку</h2>
+                </div>
+            </div>
+
+            <div class="avatar-picker">
+                @foreach (var avatar in Model.AvailablePresetAvatars)
+                {
+                    var isSelected = string.Equals(Model.AvatarUrl, avatar, StringComparison.OrdinalIgnoreCase);
+                    <label class="avatar-option">
+                        <input asp-for="SelectedPresetAvatar" type="radio" value="@avatar" checked="@isSelected" />
+                        <img src="@avatar" alt="Готовая аватарка" />
+                    </label>
+                }
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить аватарку</button>
+            </div>
+        </form>
+    </section>
+</div>

@@ -1,0 +1,70 @@
+@model ItemDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Item.ItemName;
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Item Profile</div>
+        <h1>@Model.Item.ItemName</h1>
+        <p>@Model.Summary</p>
+        <div class="hero__actions">
+            <span class="badge">@Model.Item.Category</span>
+            <span class="badge">@(Model.Item.Cost ?? 0) gold</span>
+            <a class="btn-secondary" asp-action="CompareItems" asp-route-leftId="@Model.Item.ItemID">Сравнить с другим предметом</a>
+        </div>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+        <article class="detail-card">
+            <h3>Параметры</h3>
+            <div class="meta-row"><span class="muted">Подкатегория</span><strong>@Model.Item.Subcategory</strong></div>
+            <div class="meta-row"><span class="muted">Тип</span><strong>@(Model.Item.IsNeutral ? "Нейтральный" : "Обычный")</strong></div>
+            <div class="meta-row"><span class="muted">Удалён</span><strong>@(Model.Item.IsRemoved ? "Да" : "Нет")</strong></div>
+        </article>
+        <article class="detail-card" style="grid-column: span 2;">
+            <h3>Когда покупать</h3>
+            <p class="muted">@Model.TimingAdvice</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Item.Description))
+            {
+                <p>@Model.Item.Description</p>
+            }
+        </article>
+    </section>
+
+    <section class="card-grid card-grid--two reveal">
+        <article class="detail-card">
+            <h3>Похожие предметы</h3>
+            @if (Model.RelatedItems.Any())
+            {
+                @foreach (var item in Model.RelatedItems)
+                {
+                    <a class="meta-row meta-row--link" asp-action="ItemDetails" asp-route-id="@item.ItemID">
+                        <span>@item.ItemName</span><span class="muted">@item.Category</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <p class="muted">Похожих предметов в текущем архиве пока нет.</p>
+            }
+        </article>
+        <article class="detail-card">
+            <h3>Кому подходит</h3>
+            @if (Model.SuggestedHeroes.Any())
+            {
+                @foreach (var hero in Model.SuggestedHeroes)
+                {
+                    <a class="meta-row meta-row--link" asp-action="HeroDetails" asp-route-id="@hero.HeroID">
+                        <span>@hero.HeroName</span><span class="muted">@hero.PrimaryAttribute / @hero.AttackType</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <p class="muted">Подходящие герои пока не определены.</p>
+            }
+        </article>
+    </section>
+</div>

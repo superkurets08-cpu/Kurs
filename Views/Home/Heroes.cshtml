@@ -1,0 +1,93 @@
+@model HeroesPageViewModel
+
+@{
+    ViewData["Title"] = "Герои";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Hero Database</div>
+        <h1>Герои</h1>
+        <p>Справочник с поиском по имени, фильтрацией по атрибуту и переходом в детальные карточки.</p>
+    </section>
+
+    <section class="panel reveal">
+        <form class="filters" method="get">
+            <input type="search" name="searchTerm" value="@Model.SearchTerm" placeholder="Поиск по имени или типу героя" />
+            <select name="attribute">
+                <option value="">Все атрибуты</option>
+                @foreach (var attributeOption in Model.Attributes)
+                {
+                    if (Model.Attribute == attributeOption)
+                    {
+                        <option value="@attributeOption" selected>@attributeOption</option>
+                    }
+                    else
+                    {
+                        <option value="@attributeOption">@attributeOption</option>
+                    }
+                }
+            </select>
+            <select name="attackType">
+                <option value="">Любой тип атаки</option>
+                @foreach (var attackTypeOption in Model.AttackTypes)
+                {
+                    if (Model.AttackType == attackTypeOption)
+                    {
+                        <option value="@attackTypeOption" selected>@attackTypeOption</option>
+                    }
+                    else
+                    {
+                        <option value="@attackTypeOption">@attackTypeOption</option>
+                    }
+                }
+            </select>
+            <div class="filter-actions">
+                <button class="btn-link" type="submit">Применить</button>
+                <a class="btn-secondary" asp-action="Heroes">Сбросить</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="section-heading reveal">
+        <div>
+            <div class="section-kicker">Найдено</div>
+            <h2>@Model.TotalCount героев</h2>
+        </div>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+    @if (Model.Heroes.Any())
+    {
+        @foreach (var hero in Model.Heroes)
+        {
+            <article class="list-card list-card--spotlight">
+                @if (!string.IsNullOrWhiteSpace(hero.AvatarUrl))
+                {
+                    <img class="avatar avatar--lg avatar--entity" src="@hero.AvatarUrl" alt="Аватар героя @hero.HeroName" />
+                }
+                else
+                {
+                    <div class="avatar avatar--lg avatar--fallback avatar--entity">@AvatarHelper.GetInitials(hero.HeroName)</div>
+                }
+                <h3>@hero.HeroName</h3>
+                <div class="meta-row"><span class="muted">Атрибут</span><strong>@hero.PrimaryAttribute</strong></div>
+                <div class="meta-row"><span class="muted">Тип атаки</span><strong>@hero.AttackType</strong></div>
+                <div class="meta-row"><span class="muted">STR gain</span><strong>@hero.StrengthGain</strong></div>
+                <div class="meta-row"><span class="muted">AGI gain</span><strong>@hero.AgilityGain</strong></div>
+                <div class="meta-row"><span class="muted">INT gain</span><strong>@hero.IntelligenceGain</strong></div>
+                <div class="tile__footer">
+                    <a class="btn-link btn-link--small" asp-action="HeroDetails" asp-route-id="@hero.HeroID">Подробнее</a>
+                </div>
+            </article>
+        }
+    }
+    else
+    {
+        <article class="panel panel--empty">
+            <h3>Герои не найдены</h3>
+            <p class="muted">Измените параметры поиска, чтобы увидеть больше записей.</p>
+        </article>
+    }
+    </section>
+</div>

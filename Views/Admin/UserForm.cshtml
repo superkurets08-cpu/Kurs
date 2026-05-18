@@ -1,0 +1,35 @@
+@model AdminUserFormViewModel
+
+@{
+    var isEdit = Model.AppUserId > 0;
+    ViewData["Title"] = isEdit ? "Редактирование пользователя" : "Новый пользователь";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Настройте учётную запись, роль и состояние доступа.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditUser" : "CreateUser")" method="post" class="stack-form">
+            <input asp-for="AppUserId" type="hidden" />
+            <label class="field"><span>Логин</span><input asp-for="UserName" /></label>
+            <label class="field"><span>Email</span><input asp-for="Email" type="email" /></label>
+            <label class="field">
+                <span>Роль</span>
+                <select asp-for="Role">
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </label>
+            <label class="checkbox-field"><input asp-for="IsActive" /><span>Активная учётная запись</span></label>
+            <label class="field"><span>@(isEdit ? "Новый пароль" : "Пароль")</span><input asp-for="NewPassword" type="password" /></label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Users">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

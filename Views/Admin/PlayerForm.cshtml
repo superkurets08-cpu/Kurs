@@ -1,0 +1,57 @@
+@model Player
+
+@{
+    var isEdit = Model.PlayerID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование игрока" : "Новый игрок";
+    var teams = ViewBag.Teams as IEnumerable<Team> ?? Enumerable.Empty<Team>();
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните данные игрока, привяжите его к команде и добавьте аватарку.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditPlayer" : "CreatePlayer")" method="post" enctype="multipart/form-data" class="stack-form">
+            <input asp-for="PlayerID" type="hidden" />
+            <label class="field"><span>Ник</span><input asp-for="Nickname" /></label>
+            <label class="field"><span>Настоящее имя</span><input asp-for="RealName" /></label>
+            <label class="field"><span>Страна</span><input asp-for="Country" /></label>
+            <label class="field"><span>Роль</span><input asp-for="Role" /></label>
+            <label class="field">
+                <span>Команда</span>
+                <select asp-for="TeamId">
+                    <option value="">Без команды</option>
+                    @foreach (var team in teams)
+                    {
+                        if (Model.TeamId == team.TeamID)
+                        {
+                            <option value="@team.TeamID" selected>@team.TeamName</option>
+                        }
+                        else
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    }
+                </select>
+            </label>
+            <label class="field"><span>Ссылка на профиль</span><input asp-for="player_url" /></label>
+            <label class="field"><span>URL аватарки</span><input asp-for="AvatarUrl" /></label>
+            <label class="field"><span>Загрузить аватарку</span><input type="file" name="avatarFile" accept=".png,.jpg,.jpeg,.webp,.gif" /></label>
+
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+            {
+                <div class="inline-avatar-preview">
+                    <img class="avatar avatar--lg" src="@Model.AvatarUrl" alt="Аватар игрока @Model.Nickname" />
+                    <span class="muted">Текущая аватарка игрока</span>
+                </div>
+            }
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Players">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

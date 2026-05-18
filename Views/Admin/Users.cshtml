@@ -1,0 +1,54 @@
+@model IEnumerable<AppUser>
+
+@{
+    ViewData["Title"] = "Управление пользователями";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Пользователи</h1>
+        <p>Создание аккаунтов, смена ролей и управление доступом.</p>
+    </section>
+
+    <section class="panel">
+        <div class="actions-row">
+            <a class="btn-link" asp-action="CreateUser">Добавить пользователя</a>
+            <a class="btn-secondary" asp-action="Index">Назад в админ-панель</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Логин</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Статус</th>
+                        <th>Создан</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>@(user.IsActive ? "Активен" : "Отключен")</td>
+                        <td>@user.CreatedAtUtc.ToString("dd.MM.yyyy")</td>
+                        <td class="table-actions">
+                            <a class="btn-secondary" asp-action="EditUser" asp-route-id="@user.AppUserId">Изменить</a>
+                            <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Удалить пользователя?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@user.AppUserId" />
+                                <button class="btn-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

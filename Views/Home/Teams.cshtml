@@ -1,0 +1,81 @@
+@model TeamsPageViewModel
+
+@{
+    ViewData["Title"] = "Команды";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Team Directory</div>
+        <h1>Команды</h1>
+        <p>Каталог участников архива с быстрым переходом в состав, историю матчей, сравнение и личные встречи.</p>
+    </section>
+
+    <section class="panel reveal">
+        <form class="filters filters--compact" method="get">
+            <input type="search" name="searchTerm" value="@Model.SearchTerm" placeholder="Поиск по названию или стране" />
+            <select name="country">
+                <option value="">Все страны</option>
+                @foreach (var countryOption in Model.AvailableCountries)
+                {
+                    if (Model.Country == countryOption)
+                    {
+                        <option value="@countryOption" selected>@countryOption</option>
+                    }
+                    else
+                    {
+                        <option value="@countryOption">@countryOption</option>
+                    }
+                }
+            </select>
+            <button class="btn-link" type="submit">Применить</button>
+            <a class="btn-secondary" asp-action="Teams">Сбросить</a>
+        </form>
+    </section>
+
+    <section class="section-heading reveal">
+        <div>
+            <div class="section-kicker">Всего записей</div>
+            <h2>@Model.TotalCount команд</h2>
+        </div>
+        <div class="actions-row">
+            <a class="btn-secondary" asp-action="CompareTeams">Сравнить команды</a>
+            <a class="btn-secondary" asp-action="TeamHeadToHead">Личные встречи</a>
+        </div>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+    @if (Model.Teams.Any())
+    {
+        @foreach (var team in Model.Teams)
+        {
+            <a class="tile tile--team" asp-action="TeamDetails" asp-route-id="@team.TeamID">
+                @if (!string.IsNullOrWhiteSpace(team.LogoURL))
+                {
+                    <img class="team-logo" src="@team.LogoURL" alt="Логотип команды @team.TeamName" />
+                }
+                else
+                {
+                    <div class="team-logo team-logo--placeholder">@(string.IsNullOrWhiteSpace(team.TeamName) ? "?" : team.TeamName.Substring(0, 1))</div>
+                }
+                <h3>@team.TeamName</h3>
+                <p class="muted">@team.Country</p>
+                <div class="tile__footer">
+                    <span class="badge">Team page</span>
+                    @if (!string.IsNullOrWhiteSpace(team.team_url))
+                    {
+                        <span class="link-hint">Liquipedia</span>
+                    }
+                </div>
+            </a>
+        }
+    }
+    else
+    {
+        <article class="panel panel--empty">
+            <h3>Команды не найдены</h3>
+            <p class="muted">Попробуйте изменить запрос или снять фильтр по стране.</p>
+        </article>
+    }
+    </section>
+</div>

@@ -1,0 +1,52 @@
+@model IEnumerable<Tournament>
+
+@{
+    ViewData["Title"] = "Управление турнирами";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Турниры</h1>
+        <p>Добавляйте новые турниры, изменяйте существующие записи и удаляйте устаревшие данные.</p>
+    </section>
+
+    <section class="panel">
+        <div class="actions-row">
+            <a class="btn-link" asp-action="CreateTournament">Добавить турнир</a>
+            <a class="btn-secondary" asp-action="Index">Назад в админ-панель</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Год</th>
+                        <th>Название</th>
+                        <th>Локация</th>
+                        <th>Победитель</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var tournament in Model)
+                {
+                    <tr>
+                        <td>@tournament.Year</td>
+                        <td>@tournament.TournamentName</td>
+                        <td>@tournament.Location</td>
+                        <td>@tournament.ChampionTeam</td>
+                        <td class="table-actions">
+                            <a class="btn-secondary" asp-action="EditTournament" asp-route-id="@tournament.TournamentID">Изменить</a>
+                            <form asp-action="DeleteTournament" method="post" onsubmit="return confirm('Удалить турнир?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@tournament.TournamentID" />
+                                <button class="btn-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

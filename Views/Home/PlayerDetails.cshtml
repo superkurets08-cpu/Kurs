@@ -1,0 +1,135 @@
+@model PlayerDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Player.Nickname;
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Player Profile</div>
+        @if (!string.IsNullOrWhiteSpace(Model.Player.AvatarUrl))
+        {
+            <img class="avatar avatar--hero" src="@Model.Player.AvatarUrl" alt="Аватар игрока @Model.Player.Nickname" />
+        }
+        else
+        {
+            <div class="avatar avatar--hero avatar--fallback">@AvatarHelper.GetInitials(Model.Player.Nickname)</div>
+        }
+        <h1>@Model.Player.Nickname</h1>
+        <p>@Model.Player.RealName • @Model.Player.Country</p>
+        <div class="hero__actions">
+            @if (!string.IsNullOrWhiteSpace(Model.Player.Role))
+            {
+                <span class="badge">@Model.Player.Role</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Team?.TeamName ?? Model.Player.Team))
+            {
+                <span class="badge">@(Model.Team?.TeamName ?? Model.Player.Team)</span>
+            }
+            <span class="badge">@Model.MvpAwardsCount MVP</span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Player.player_url))
+        {
+            <a class="btn-secondary" href="@Model.Player.player_url" target="_blank" rel="noreferrer">Открыть внешний профиль</a>
+        }
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+        <article class="detail-card">
+            <h3>Профиль</h3>
+            <div class="meta-row"><span class="muted">Ник</span><strong>@Model.Player.Nickname</strong></div>
+            <div class="meta-row"><span class="muted">Имя</span><strong>@Model.Player.RealName</strong></div>
+            <div class="meta-row"><span class="muted">Страна</span><strong>@Model.Player.Country</strong></div>
+            <div class="meta-row"><span class="muted">Роль</span><strong>@Model.Player.Role</strong></div>
+            <div class="meta-row"><span class="muted">Команда</span><strong>@(Model.Team?.TeamName ?? Model.Player.Team)</strong></div>
+        </article>
+
+        <article class="detail-card" style="grid-column: span 2;">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">Recent Activity</div>
+                    <h3>Последние матчи</h3>
+                </div>
+                @if (Model.Team != null)
+                {
+                    <a class="btn-secondary" asp-action="TeamDetails" asp-route-id="@Model.Team.TeamID">Страница команды</a>
+                }
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Турнир</th>
+                            <th>Стадия</th>
+                            <th>Матчап</th>
+                            <th>MVP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model.RecentMatches.Any())
+                    {
+                        @foreach (var match in Model.RecentMatches)
+                        {
+                            <tr>
+                                <td>@match.MatchDate?.ToString("dd.MM.yyyy")</td>
+                                <td>@match.Tournament?.TournamentName</td>
+                                <td>@match.Stage</td>
+                                <td>@match.Team1?.TeamName vs @match.Team2?.TeamName</td>
+                                <td>@(match.MVPPlayerID == Model.Player.PlayerID ? "Да" : "-")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">Для этого игрока пока нет матчей в архиве.</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+
+    <section class="panel reveal">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Roster History</div>
+                <h2>История команд</h2>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Команда</th>
+                        <th>Период</th>
+                        <th>Статус</th>
+                        <th>Метка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.RosterHistory.Any())
+                {
+                    @foreach (var membership in Model.RosterHistory)
+                    {
+                        <tr>
+                            <td>@membership.Team.TeamName</td>
+                            <td>@membership.StartYear - @(membership.EndYear?.ToString() ?? "н.в.")</td>
+                            <td>@(membership.IsCurrent ? "Текущая" : "Архив")</td>
+                            <td>@membership.Label</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">История составов для игрока пока не заполнена.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

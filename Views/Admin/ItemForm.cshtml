@@ -1,0 +1,32 @@
+@model Item
+
+@{
+    var isEdit = Model.ItemID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование предмета" : "Новый предмет";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните параметры предмета.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditItem" : "CreateItem")" method="post" class="stack-form">
+            <input asp-for="ItemID" type="hidden" />
+            <label class="field"><span>Название предмета</span><input asp-for="ItemName" /></label>
+            <label class="field"><span>Стоимость</span><input asp-for="Cost" type="number" /></label>
+            <label class="field"><span>Категория</span><input asp-for="Category" /></label>
+            <label class="field"><span>Подкатегория</span><input asp-for="Subcategory" /></label>
+            <label class="field"><span>Описание</span><textarea asp-for="Description" rows="4"></textarea></label>
+            <label class="checkbox-field"><input asp-for="IsNeutral" /><span>Нейтральный предмет</span></label>
+            <label class="field"><span>Тир нейтрального предмета</span><input asp-for="NeutralTier" type="number" /></label>
+            <label class="checkbox-field"><input asp-for="IsRemoved" /><span>Удалён из игры</span></label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Items">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

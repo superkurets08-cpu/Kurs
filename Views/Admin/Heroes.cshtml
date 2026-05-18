@@ -1,0 +1,62 @@
+@model IEnumerable<Hero>
+
+@{
+    ViewData["Title"] = "Управление героями";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Герои</h1>
+        <p>Редактирование справочника героев, характеристик и изображений.</p>
+    </section>
+
+    <section class="panel">
+        <div class="actions-row">
+            <a class="btn-link" asp-action="CreateHero">Добавить героя</a>
+            <a class="btn-secondary" asp-action="Index">Назад в админ-панель</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Герой</th>
+                        <th>Атрибут</th>
+                        <th>Тип атаки</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var hero in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="entity-cell">
+                                @if (!string.IsNullOrWhiteSpace(hero.AvatarUrl))
+                                {
+                                    <img class="avatar avatar--sm" src="@hero.AvatarUrl" alt="Аватар героя @hero.HeroName" />
+                                }
+                                else
+                                {
+                                    <div class="avatar avatar--sm avatar--fallback">@AvatarHelper.GetInitials(hero.HeroName)</div>
+                                }
+                                <span>@hero.HeroName</span>
+                            </div>
+                        </td>
+                        <td>@hero.PrimaryAttribute</td>
+                        <td>@hero.AttackType</td>
+                        <td class="table-actions">
+                            <a class="btn-secondary" asp-action="EditHero" asp-route-id="@hero.HeroID">Изменить</a>
+                            <form asp-action="DeleteHero" method="post" onsubmit="return confirm('Удалить героя?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@hero.HeroID" />
+                                <button class="btn-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

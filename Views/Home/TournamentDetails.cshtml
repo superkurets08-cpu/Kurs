@@ -1,0 +1,157 @@
+@model TournamentDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Tournament.TournamentName;
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Tournament Profile</div>
+        <h1>@Model.Tournament.TournamentName</h1>
+        <p>@Model.Details.Location • @Model.Details.Dates</p>
+        <div class="hero__actions">
+            <span class="badge">@Model.Details.Champion</span>
+            <span class="badge">@Model.Matches.Count матчей в базе</span>
+            <span class="badge">@Model.Comments.Count комментариев</span>
+        </div>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+        <article class="detail-card">
+            <h3>Общая информация</h3>
+            <div class="meta-row"><span class="muted">Год</span><strong>@Model.Details.Year</strong></div>
+            <div class="meta-row"><span class="muted">Арена</span><strong>@Model.Details.Venue</strong></div>
+            <div class="meta-row"><span class="muted">Формат</span><strong>@Model.Details.Format</strong></div>
+            <div class="meta-row"><span class="muted">Организатор</span><strong>@Model.Details.Organizer</strong></div>
+        </article>
+
+        <article class="detail-card">
+            <h3>Результат</h3>
+            <div class="meta-row"><span class="muted">Победитель</span><strong>@Model.Details.Champion</strong></div>
+            <div class="meta-row"><span class="muted">Финалист</span><strong>@Model.Details.RunnerUp</strong></div>
+            <div class="meta-row"><span class="muted">MVP</span><strong>@Model.Details.MVP</strong></div>
+            <div class="meta-row"><span class="muted">Версия</span><strong>@Model.Details.Version</strong></div>
+        </article>
+
+        <article class="detail-card">
+            <h3>Статистика</h3>
+            <div class="meta-row"><span class="muted">Призовой фонд</span><strong>@Model.Details.PrizePoolTotal</strong></div>
+            <div class="meta-row"><span class="muted">Участников</span><strong>@Model.Details.Participants</strong></div>
+            <div class="meta-row"><span class="muted">Матчей</span><strong>@Model.Details.Matches</strong></div>
+            <div class="meta-row"><span class="muted">Героев</span><strong>@Model.Details.Heroes</strong></div>
+        </article>
+    </section>
+
+    <section class="panel reveal">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Match Timeline</div>
+                <h2>Матчи по турниру</h2>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Стадия</th>
+                        <th>Дата</th>
+                        <th>Команда 1</th>
+                        <th>Команда 2</th>
+                        <th>MVP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Matches.Any())
+                {
+                    @foreach (var match in Model.Matches)
+                    {
+                        <tr>
+                            <td>@match.Stage</td>
+                            <td>@match.MatchDate?.ToString("dd.MM.yyyy")</td>
+                            <td>@match.Team1?.TeamName</td>
+                            <td>@match.Team2?.TeamName</td>
+                            <td>@match.MVP?.Nickname</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">Для этого турнира пока нет отдельных матчей в базе.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel reveal">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">Community</div>
+                <h2>Комментарии</h2>
+            </div>
+        </div>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form asp-action="AddTournamentComment" method="post" class="stack-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TournamentId" value="@Model.Tournament.TournamentID" />
+                <label class="field">
+                    <span>Новый комментарий</span>
+                    <textarea name="Content" rows="4" maxlength="1000" minlength="3" placeholder="Поделитесь мнением о турнире"></textarea>
+                </label>
+                <div class="actions-row">
+                    <button class="btn-link" type="submit">Сохранить комментарий</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p class="muted">Чтобы оставлять комментарии, войдите в аккаунт.</p>
+        }
+
+        <div class="search-results comments-list">
+            @if (Model.Comments.Any())
+            {
+                @foreach (var comment in Model.Comments)
+                {
+                    <article class="search-result search-result--comment">
+                        <div class="comment-card">
+                            @if (!string.IsNullOrWhiteSpace(comment.User.AvatarUrl))
+                            {
+                                <img class="avatar avatar--md" src="@comment.User.AvatarUrl" alt="Аватар пользователя @comment.User.UserName" />
+                            }
+                            else
+                            {
+                                <div class="avatar avatar--md avatar--fallback">@AvatarHelper.GetInitials(comment.User.UserName)</div>
+                            }
+                            <div class="comment-card__body">
+                                <span class="search-result__category">@comment.User.UserName</span>
+                                <h3>@comment.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</h3>
+                                <p class="muted">@comment.Content</p>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <form asp-action="DeleteTournamentComment" method="post" class="comment-card__actions" onsubmit="return confirm('Удалить комментарий?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@comment.TournamentCommentId" />
+                                    <input type="hidden" name="tournamentId" value="@Model.Tournament.TournamentID" />
+                                    <button class="btn-danger" type="submit">Удалить</button>
+                                </form>
+                            }
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <h3>Комментариев пока нет</h3>
+                    <p class="muted">Вы можете стать первым, кто оставит отзыв об этом турнире.</p>
+                </div>
+            }
+        </div>
+    </section>
+</div>

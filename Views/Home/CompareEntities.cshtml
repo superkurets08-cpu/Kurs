@@ -1,0 +1,87 @@
+@model ComparePageViewModel
+
+@{
+    ViewData["Title"] = "Сравнение";
+    string actionName = Model.EntityType switch
+    {
+        "items" => "CompareItems",
+        _ => "CompareTeams"
+    };
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Comparison Mode</div>
+        <h1>Сравнение @Model.EntityTypeLabel</h1>
+        <p>@Model.Summary</p>
+    </section>
+
+    <section class="panel reveal">
+        <form method="get" asp-action="@actionName" class="filters">
+            <select name="leftId">
+                <option value="">Выберите первый объект</option>
+                @foreach (var option in Model.Options)
+                {
+                    if (Model.LeftId == option.Id)
+                    {
+                        <option value="@option.Id" selected>@option.Label</option>
+                    }
+                    else
+                    {
+                        <option value="@option.Id">@option.Label</option>
+                    }
+                }
+            </select>
+            <select name="rightId">
+                <option value="">Выберите второй объект</option>
+                @foreach (var option in Model.Options)
+                {
+                    if (Model.RightId == option.Id)
+                    {
+                        <option value="@option.Id" selected>@option.Label</option>
+                    }
+                    else
+                    {
+                        <option value="@option.Id">@option.Label</option>
+                    }
+                }
+            </select>
+            <div class="filter-actions">
+                <button class="btn-link" type="submit">Сравнить</button>
+            </div>
+        </form>
+    </section>
+
+    @if (Model.HasComparison)
+    {
+        <section class="panel reveal">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">Результат</div>
+                    <h2>@Model.LeftTitle vs @Model.RightTitle</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Метрика</th>
+                            <th>@Model.LeftTitle</th>
+                            <th>@Model.RightTitle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var metric in Model.Metrics)
+                    {
+                        <tr>
+                            <td>@metric.Label</td>
+                            <td>@metric.LeftValue</td>
+                            <td>@metric.RightValue</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</div>

@@ -1,0 +1,70 @@
+@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Регистрация";
+    var googleLoginEnabled = ViewData["GoogleLoginEnabled"] as bool? == true;
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>Регистрация</h1>
+        <p>После регистрации пользователь получает расширенный доступ к архиву и дополнительным разделам проекта.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="Register" method="post" class="stack-form">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <label class="field">
+                <span>Логин</span>
+                <input asp-for="UserName" />
+                <span asp-validation-for="UserName" class="field-validation"></span>
+            </label>
+
+            <label class="field">
+                <span>Электронная почта</span>
+                <input asp-for="Email" />
+                <span asp-validation-for="Email" class="field-validation"></span>
+            </label>
+
+            <label class="field">
+                <span>Пароль</span>
+                <input asp-for="Password" />
+                <span asp-validation-for="Password" class="field-validation"></span>
+            </label>
+
+            <label class="field">
+                <span>Подтверждение пароля</span>
+                <input asp-for="ConfirmPassword" />
+                <span asp-validation-for="ConfirmPassword" class="field-validation"></span>
+            </label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Зарегистрироваться</button>
+                <a class="btn-secondary" asp-action="Login">У меня уже есть аккаунт</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Регистрация через Google</h2>
+        <p class="muted">Если удобнее, можно создать аккаунт и войти через Google за один шаг.</p>
+
+        @if (googleLoginEnabled)
+        {
+            <form asp-action="ExternalLogin" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Google" />
+                <button class="btn-secondary" type="submit">Зарегистрироваться через Google</button>
+            </form>
+        }
+        else
+        {
+            <p class="muted">Google-регистрация появится после заполнения `Authentication:Google:ClientId` и `Authentication:Google:ClientSecret`.</p>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

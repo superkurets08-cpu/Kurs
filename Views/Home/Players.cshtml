@@ -1,0 +1,127 @@
+@model PlayersPageViewModel
+
+@{
+    ViewData["Title"] = "Игроки";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Player Profiles</div>
+        <h1>Игроки</h1>
+        <p>База игроков с фильтрацией по ролям и странам, переходом в профиль и связью с текущей командой.</p>
+    </section>
+
+    <section class="stats-grid reveal">
+        <article class="stat-card">
+            <span class="stat-card__label">Игроки</span>
+            <strong class="stat-card__value">@Model.TotalPlayers</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-card__label">Команды</span>
+            <strong class="stat-card__value">@Model.TotalTeams</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-card__label">Страны</span>
+            <strong class="stat-card__value">@Model.TotalCountries</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-card__label">Записей на странице</span>
+            <strong class="stat-card__value">@Model.Players.Count</strong>
+        </article>
+    </section>
+
+    <section class="panel reveal">
+        <form class="filters" method="get">
+            <input type="search" name="searchTerm" value="@Model.SearchTerm" placeholder="Поиск по нику, имени или команде" />
+            <select name="country">
+                <option value="">Все страны</option>
+                @foreach (var countryOption in Model.AvailableCountries)
+                {
+                    if (Model.Country == countryOption)
+                    {
+                        <option value="@countryOption" selected>@countryOption</option>
+                    }
+                    else
+                    {
+                        <option value="@countryOption">@countryOption</option>
+                    }
+                }
+            </select>
+            <select name="role">
+                <option value="">Все роли</option>
+                @foreach (var roleOption in Model.AvailableRoles)
+                {
+                    if (Model.Role == roleOption)
+                    {
+                        <option value="@roleOption" selected>@roleOption</option>
+                    }
+                    else
+                    {
+                        <option value="@roleOption">@roleOption</option>
+                    }
+                }
+            </select>
+            <div class="filter-actions">
+                <button class="btn-link" type="submit">Применить</button>
+                <a class="btn-secondary" asp-action="Players">Сбросить</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel reveal">
+        <div class="table-wrap">
+            <table id="players-table">
+                <thead>
+                    <tr>
+                        <th>Игрок</th>
+                        <th>Имя</th>
+                        <th>Страна</th>
+                        <th>Роль</th>
+                        <th>Команда</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Players.Any())
+                {
+                    @foreach (var player in Model.Players)
+                    {
+                        <tr>
+                            <td>
+                                <div class="entity-cell">
+                                    @if (!string.IsNullOrWhiteSpace(player.AvatarUrl))
+                                    {
+                                        <img class="avatar avatar--sm" src="@player.AvatarUrl" alt="Аватар игрока @player.Nickname" />
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar avatar--sm avatar--fallback">@AvatarHelper.GetInitials(player.Nickname)</div>
+                                    }
+                                    <span>@player.Nickname</span>
+                                </div>
+                            </td>
+                            <td>@player.RealName</td>
+                            <td>@player.Country</td>
+                            <td>@player.Role</td>
+                            <td>@(player.CurrentTeam?.TeamName ?? player.Team)</td>
+                            <td class="table-actions">
+                                <a class="btn-link btn-link--small" asp-action="PlayerDetails" asp-route-id="@player.PlayerID">Профиль</a>
+                                @if (!string.IsNullOrWhiteSpace(player.player_url))
+                                {
+                                    <a class="btn-secondary btn-link--small" href="@player.player_url" target="_blank" rel="noreferrer">Liquipedia</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">Игроки по выбранным фильтрам не найдены.</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

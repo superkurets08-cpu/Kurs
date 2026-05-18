@@ -1,0 +1,86 @@
+@model ItemsPageViewModel
+
+@{
+    ViewData["Title"] = "Предметы";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Item Compendium</div>
+        <h1>Предметы</h1>
+        <p>Каталог предметов с фильтрацией по категории, выделением neutral items и переходом в карточки.</p>
+    </section>
+
+    <section class="panel reveal">
+        <form class="filters" method="get">
+            <input type="search" name="searchTerm" value="@Model.SearchTerm" placeholder="Поиск по названию, категории или описанию" />
+            <select name="category">
+                <option value="">Все категории</option>
+                @foreach (var categoryOption in Model.Categories)
+                {
+                    if (Model.Category == categoryOption)
+                    {
+                        <option value="@categoryOption" selected>@categoryOption</option>
+                    }
+                    else
+                    {
+                        <option value="@categoryOption">@categoryOption</option>
+                    }
+                }
+            </select>
+            <label class="checkbox-field checkbox-field--panel">
+                @if (Model.NeutralOnly)
+                {
+                    <input type="checkbox" name="neutralOnly" value="true" checked />
+                }
+                else
+                {
+                    <input type="checkbox" name="neutralOnly" value="true" />
+                }
+                <span>Только neutral items</span>
+            </label>
+            <div class="filter-actions">
+                <button class="btn-link" type="submit">Применить</button>
+                <a class="btn-secondary" asp-action="Items">Сбросить</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="section-heading reveal">
+        <div>
+            <div class="section-kicker">Найдено</div>
+            <h2>@Model.TotalCount предметов</h2>
+        </div>
+        <a class="btn-secondary" asp-action="CompareItems">Сравнить предметы</a>
+    </section>
+
+    <section class="card-grid card-grid--three reveal">
+    @if (Model.Items.Any())
+    {
+        @foreach (var item in Model.Items)
+        {
+            <article class="list-card">
+                <h3>@item.ItemName</h3>
+                <div class="meta-row"><span class="muted">Категория</span><strong>@item.Category</strong></div>
+                <div class="meta-row"><span class="muted">Подкатегория</span><strong>@item.Subcategory</strong></div>
+                <div class="meta-row"><span class="muted">Стоимость</span><strong>@(item.Cost ?? 0)</strong></div>
+                <div class="meta-row"><span class="muted">Тип</span><strong>@(item.IsNeutral ? "Нейтральный" : "Обычный")</strong></div>
+                @if (!string.IsNullOrWhiteSpace(item.Description))
+                {
+                    <p class="muted">@item.Description</p>
+                }
+                <div class="tile__footer">
+                    <a class="btn-link btn-link--small" asp-action="ItemDetails" asp-route-id="@item.ItemID">Подробнее</a>
+                </div>
+            </article>
+        }
+    }
+    else
+    {
+        <article class="panel panel--empty">
+            <h3>Предметы не найдены</h3>
+            <p class="muted">Попробуйте другой запрос или отключите фильтр neutral items.</p>
+        </article>
+    }
+    </section>
+</div>

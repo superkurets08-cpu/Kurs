@@ -1,0 +1,29 @@
+@model Tournament
+
+@{
+    var isEdit = Model.TournamentID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование турнира" : "Новый турнир";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните основные поля записи турнира.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditTournament" : "CreateTournament")" method="post" class="stack-form">
+            <input asp-for="TournamentID" type="hidden" />
+            <label class="field"><span>Название турнира</span><input asp-for="TournamentName" /></label>
+            <label class="field"><span>Год</span><input asp-for="Year" type="number" /></label>
+            <label class="field"><span>Призовой фонд</span><input asp-for="PrizePool" type="number" step="0.000001" /></label>
+            <label class="field"><span>Локация</span><input asp-for="Location" /></label>
+            <label class="field"><span>Победитель</span><input asp-for="ChampionTeam" /></label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Tournaments">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

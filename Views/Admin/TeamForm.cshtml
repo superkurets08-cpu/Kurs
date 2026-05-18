@@ -1,0 +1,28 @@
+@model Team
+
+@{
+    var isEdit = Model.TeamID > 0;
+    ViewData["Title"] = isEdit ? "Редактирование команды" : "Новая команда";
+}
+
+<div class="page-container page-container--narrow">
+    <section class="hero">
+        <h1>@ViewData["Title"]</h1>
+        <p>Заполните данные команды.</p>
+    </section>
+
+    <section class="panel">
+        <form asp-action="@(isEdit ? "EditTeam" : "CreateTeam")" method="post" class="stack-form">
+            <input asp-for="TeamID" type="hidden" />
+            <label class="field"><span>Название команды</span><input asp-for="TeamName" /></label>
+            <label class="field"><span>Страна</span><input asp-for="Country" /></label>
+            <label class="field"><span>Логотип URL</span><input asp-for="LogoURL" /></label>
+            <label class="field"><span>Ссылка на профиль</span><input asp-for="team_url" /></label>
+
+            <div class="actions-row">
+                <button class="btn-link" type="submit">Сохранить</button>
+                <a class="btn-secondary" asp-action="Teams">Отмена</a>
+            </div>
+        </form>
+    </section>
+</div>

@@ -1,0 +1,116 @@
+@model TeamHeadToHeadViewModel
+
+@{
+    ViewData["Title"] = "Личные встречи";
+}
+
+<div class="page-container">
+    <section class="hero reveal">
+        <div class="hero__eyebrow">Head-to-Head</div>
+        <h1>Личные встречи команд</h1>
+        <p>Выберите две команды, чтобы посмотреть их очные матчи и статистику противостояния.</p>
+    </section>
+
+    <section class="panel reveal">
+        <form method="get" asp-action="TeamHeadToHead" class="filters">
+            <select name="leftId">
+                <option value="">Выберите первую команду</option>
+                @foreach (var option in Model.Options)
+                {
+                    if (Model.LeftId == option.Id)
+                    {
+                        <option value="@option.Id" selected>@option.Label</option>
+                    }
+                    else
+                    {
+                        <option value="@option.Id">@option.Label</option>
+                    }
+                }
+            </select>
+            <select name="rightId">
+                <option value="">Выберите вторую команду</option>
+                @foreach (var option in Model.Options)
+                {
+                    if (Model.RightId == option.Id)
+                    {
+                        <option value="@option.Id" selected>@option.Label</option>
+                    }
+                    else
+                    {
+                        <option value="@option.Id">@option.Label</option>
+                    }
+                }
+            </select>
+            <div class="filter-actions">
+                <button class="btn-link" type="submit">Показать</button>
+            </div>
+        </form>
+    </section>
+
+    @if (Model.HasSelection)
+    {
+        <section class="stats-grid reveal">
+            <article class="stat-card">
+                <span class="stat-card__label">@Model.LeftTitle</span>
+                <strong class="stat-card__value">@Model.LeftWins</strong>
+            </article>
+            <article class="stat-card stat-card--accent">
+                <span class="stat-card__label">Всего матчей</span>
+                <strong class="stat-card__value">@Model.Matches.Count</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-card__label">@Model.RightTitle</span>
+                <strong class="stat-card__value">@Model.RightWins</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-card__label">Без победителя</span>
+                <strong class="stat-card__value">@Model.DrawLikeCount</strong>
+            </article>
+        </section>
+
+        <section class="panel reveal">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">Матчи</div>
+                    <h2>@Model.LeftTitle vs @Model.RightTitle</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Турнир</th>
+                            <th>Стадия</th>
+                            <th>Матч</th>
+                            <th>Победитель</th>
+                            <th>MVP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model.Matches.Any())
+                    {
+                        @foreach (var match in Model.Matches)
+                        {
+                            <tr>
+                                <td>@match.MatchDate?.ToString("dd.MM.yyyy")</td>
+                                <td>@match.Tournament?.TournamentName</td>
+                                <td>@match.Stage</td>
+                                <td>@match.Team1?.TeamName vs @match.Team2?.TeamName</td>
+                                <td>@(match.WinnerTeam?.TeamName ?? "-")</td>
+                                <td>@(match.MVP?.Nickname ?? "-")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">Для выбранных команд личные встречи пока не найдены.</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</div>

@@ -1,0 +1,50 @@
+@model IEnumerable<Item>
+
+@{
+    ViewData["Title"] = "Управление предметами";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Предметы</h1>
+        <p>Редактирование категорий, описаний и признаков нейтральных предметов.</p>
+    </section>
+
+    <section class="panel">
+        <div class="actions-row">
+            <a class="btn-link" asp-action="CreateItem">Добавить предмет</a>
+            <a class="btn-secondary" asp-action="Index">Назад в админ-панель</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Стоимость</th>
+                        <th>Категория</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ItemName</td>
+                        <td>@item.Cost</td>
+                        <td>@item.Category</td>
+                        <td class="table-actions">
+                            <a class="btn-secondary" asp-action="EditItem" asp-route-id="@item.ItemID">Изменить</a>
+                            <form asp-action="DeleteItem" method="post" onsubmit="return confirm('Удалить предмет?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.ItemID" />
+                                <button class="btn-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

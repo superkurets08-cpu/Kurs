@@ -1,0 +1,54 @@
+@model IEnumerable<Match>
+
+@{
+    ViewData["Title"] = "Управление матчами";
+}
+
+<div class="page-container">
+    <section class="hero">
+        <h1>Матчи</h1>
+        <p>Управление матчами архива, победителями и MVP.</p>
+    </section>
+
+    <section class="panel">
+        <div class="actions-row">
+            <a class="btn-link" asp-action="CreateMatch">Добавить матч</a>
+            <a class="btn-secondary" asp-action="Index">Назад в админ-панель</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Турнир</th>
+                        <th>Матч</th>
+                        <th>Победитель</th>
+                        <th>MVP</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var match in Model)
+                {
+                    <tr>
+                        <td>@match.MatchDate?.ToString("dd.MM.yyyy")</td>
+                        <td>@match.Tournament?.TournamentName</td>
+                        <td>@match.Team1?.TeamName vs @match.Team2?.TeamName</td>
+                        <td>@match.WinnerTeam?.TeamName</td>
+                        <td>@match.MVP?.Nickname</td>
+                        <td class="table-actions">
+                            <a class="btn-secondary" asp-action="EditMatch" asp-route-id="@match.MatchID">Изменить</a>
+                            <form asp-action="DeleteMatch" method="post" onsubmit="return confirm('Удалить матч?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@match.MatchID" />
+                                <button class="btn-danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

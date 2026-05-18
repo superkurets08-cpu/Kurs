@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Dota 2 Archive</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var avatarUrl = User.FindFirst("avatar_url")?.Value;
+        var userName = User.Identity?.Name ?? "User";
+        var userInitials = AvatarHelper.GetInitials(userName);
+    }
+
+    <header class="shell-header">
+        <div class="shell-header__inner">
+            <a class="brand" href="/">
+                <span class="brand__mark">Aegis</span>
+                <span class="brand__text">
+                    <strong>Dota 2 Archive</strong>
+                    <span>The International archive and team intelligence</span>
+                </span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="shell-header__content" id="site-nav">
+                <form class="header-search" asp-controller="Home" asp-action="Search" method="get">
+                    <input type="search" name="query" value="@Context.Request.Query["query"]" placeholder="Поиск по турнирам, командам и игрокам" />
+                    <button type="submit" class="btn-link btn-link--small">Найти</button>
+                    <div class="search-suggestions" data-search-suggestions></div>
+                </form>
+
+                <div class="shell-header__navgroup">
+                    <nav class="shell-nav">
+                        <a class="@(currentAction == "Tournaments" ? "is-active" : null)" asp-controller="Home" asp-action="Tournaments">Турниры</a>
+                        <a class="@(currentAction == "Teams" || currentAction == "TeamDetails" || currentAction == "CompareTeams" || currentAction == "TeamHeadToHead" ? "is-active" : null)" asp-controller="Home" asp-action="Teams">Команды</a>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="@(currentAction == "Players" || currentAction == "PlayerDetails" ? "is-active" : null)" asp-controller="Home" asp-action="Players">Игроки</a>
+                            <a class="@(currentAction == "Heroes" || currentAction == "HeroDetails" ? "is-active" : null)" asp-controller="Home" asp-action="Heroes">Герои</a>
+                            <a class="@(currentAction == "Items" || currentAction == "ItemDetails" || currentAction == "CompareItems" ? "is-active" : null)" asp-controller="Home" asp-action="Items">Предметы</a>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="@(currentController == "Admin" ? "is-active" : null)" asp-controller="Admin" asp-action="Index">Админ-панель</a>
+                        }
+                    </nav>
+                </div>
+
+                <div class="auth-panel">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a class="profile-chip @(currentController == "Account" && currentAction == "Profile" ? "is-active" : null)" asp-controller="Account" asp-action="Profile">
+                            @if (!string.IsNullOrWhiteSpace(avatarUrl))
+                            {
+                                <img class="avatar avatar--sm" src="@avatarUrl" alt="Аватар пользователя @userName" />
+                            }
+                            else
+                            {
+                                <span class="avatar avatar--sm avatar--fallback">@userInitials</span>
+                            }
+                            <span class="profile-chip__meta">
+                                <strong>@userName</strong>
+                                <span>@(User.IsInRole("Admin") ? "Администратор" : "Личный кабинет")</span>
+                            </span>
+                        </a>
+
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn-secondary" type="submit">Выйти</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn-secondary" asp-controller="Account" asp-action="Login">Войти</a>
+                        <a class="btn-link btn-link--small" asp-controller="Account" asp-action="Register">Регистрация</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="page-container">
+                <div class="flash-message flash-message--success">@successMessage</div>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] is string errorMessage)
+        {
+            <div class="page-container">
+                <div class="flash-message flash-message--danger">@errorMessage</div>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="shell-footer">
+        <div class="shell-footer__inner">
+            <div>
+                <strong>Dota 2 Archive</strong>
+                <p>Курсовой проект на ASP.NET Core MVC с акцентом на турнирный архив, навигацию по командам и справочную базу по экосистеме The International.</p>
+            </div>
+            <div class="footer-links">
+                <a asp-controller="Home" asp-action="Tournaments">Турниры</a>
+                <a asp-controller="Home" asp-action="Teams">Команды</a>
+                <a asp-controller="Home" asp-action="Search">Поиск</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
